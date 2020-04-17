@@ -1,7 +1,6 @@
-# telnet program example
 import socket
-import select
-import string
+import threading
+from encryption import symmetric_encrypt, symmetric_decrypt
 import sys
 
 
@@ -10,50 +9,43 @@ def prompt():
     sys.stdout.flush()
 
 
-# main function
-if __name__ == "__main__":
+def read_sok(running):
+    while not running:
+        data = sor.recv(1024)
+        try:
+            sys.stdout.write('\r'+symmetric_decrypt(data, key)+'\n')
+        except UnicodeDecodeError as e:
+            print('\r'+'...        '+'\n')
+        prompt()
 
-    if(len(sys.argv) < 3):
-        print('Usage : python telnet.py hostname port')
+
+if(len(sys.argv) < 3):
+    print('Usage : python client2.py hostname port')
+    sys.exit()
+
+host = sys.argv[1]
+port = int(sys.argv[2])
+
+server = (host, port)  # Данные сервера
+alias = input("Username: ")  # Вводим наш псевдоним
+key = input("Key: ")
+sor = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sor.bind(('', 0))  # Задаем сокет как клиент
+message = '<' + alias + '> Connected to server'
+sor.sendto((symmetric_encrypt(message, key)),
+           server)  # Уведомляем сервер о подключении
+pill2kill = threading.Event()
+potok = threading.Thread(target=read_sok, args=(pill2kill,))
+potok.start()
+print('Connected to remote host. Start sending messages')
+prompt()
+
+while 1:
+    mensahe = input()
+    if mensahe=='exit':
+        pill2kill.set()
+        potok.join()
         sys.exit()
-
-    host = sys.argv[1]
-    port = int(sys.argv[2])
-
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(2)
-
-    # connect to remote host
-    try:
-        s.connect((host, port))
-    except:
-        print('Unable to connect')
-        sys.exit()
-
-    print('Connected to remote host. Start sending messages')
+    message = '<' + alias + '> ' + mensahe
+    sor.sendto((symmetric_encrypt(message, key)), server)
     prompt()
-
-    while 1:
-        socket_list = [sys.stdin, s]
-
-        # Get the list sockets which are readable
-        read_sockets, write_sockets, error_sockets = select.select(
-            socket_list, [], [])
-
-        for sock in read_sockets:
-            # incoming message from remote server
-            if sock == s:
-                data = sock.recv(4096)
-                if not data:
-                    print('\nDisconnected from chat server')
-                    sys.exit()
-                else:
-                    # print data
-                    sys.stdout.write(data)
-                    prompt()
-
-            # user entered a message
-            else:
-                msg = sys.stdin.readline()
-                s.send(msg.encode())
-                prompt()
