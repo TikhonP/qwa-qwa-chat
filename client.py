@@ -4,7 +4,7 @@ from encryption import symmetric_encrypt, symmetric_decrypt
 import sys
 
 # settings
-is_pyinstaller = False
+is_pyinstaller = True
 
 
 def prompt():
@@ -24,7 +24,7 @@ def read_sok():
 
 if is_pyinstaller:
     host = input('Enter hostname server > ')
-    port = input('Enter port server > ')
+    port = int(input('Enter port server > '))
 else:
     if(len(sys.argv) < 3):
         print('Usage : python client2.py hostname port')
