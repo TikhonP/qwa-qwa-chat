@@ -3,6 +3,9 @@ import threading
 from encryption import symmetric_encrypt, symmetric_decrypt
 import sys
 
+# settings
+is_pyinstaller = False
+
 
 def prompt():
     sys.stdout.write('<You> ')
@@ -19,13 +22,17 @@ def read_sok():
         prompt()
 
 
-# if(len(sys.argv) < 3):
-#     print('Usage : python client2.py hostname port')
-#     sys.exit()
+if is_pyinstaller:
+    host = input('Enter hostname server > ')
+    port = input('Enter port server > ')
+else:
+    if(len(sys.argv) < 3):
+        print('Usage : python client2.py hostname port')
+        sys.exit()
+    else:
+        host = sys.argv[1]
+        port = int(sys.argv[2])
 
-
-host = '192.168.31.158'#sys.argv[1]
-port = 5050#int(sys.argv[2])
 
 server = (host, port)  # Данные сервера
 alias = input("Username: ")  # Вводим наш псевдоним

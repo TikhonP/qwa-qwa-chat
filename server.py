@@ -1,6 +1,10 @@
 import socket
+import sys
 
-PORT = 5050
+if len(sys.argv)<2:
+    print("Usage : python server.py port")
+else:
+    PORT = sys.argv[1]
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(('0.0.0.0', PORT))
