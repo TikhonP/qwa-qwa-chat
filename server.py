@@ -13,7 +13,7 @@ clients = []  # Массив где храним адреса клиентов
 print("Chat server started on port " + str(PORT))
 while 1:
     data, address = sock.recvfrom(1024)
-    print(address)
+    print('Data...')
     if address not in clients:
         clients.append(address)  # Если такова клиента нету , то добавить
 
