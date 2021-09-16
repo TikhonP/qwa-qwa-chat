@@ -6,7 +6,7 @@ import sys
 import json
 
 # settings
-is_pyinstaller = True
+is_pyinstaller = False
 use_username = True
 
 running = True
@@ -29,7 +29,7 @@ def read_sok():
         except UnicodeDecodeError as e:
             print('\r' + '...        ' + '\n')
         prompt()
-
+    quit()
 
 def setting():
     global host, port, alias
